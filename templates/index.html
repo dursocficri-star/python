@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>La storia di cappuccetto rosso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="story-card">
+      <p class="eyebrow">Cappuccetto Rosso</p>
+      <h1>Capitolo 1, il lupo.</h1>
+      <p class="story-text">
+        C'era una volta, in un piccolo villaggio ai margini di un grande bosco, una bambina dolce e gentile che tutti chiamavano Cappuccetto Rosso, perché indossava sempre un mantellino rosso con un cappuccio, regalo della sua nonna.
+
+Un giorno, la mamma la chiamò e le disse:
+
+— Cappuccetto Rosso, la nonna è malata. Ho preparato un cestino con del pane, dei biscotti e un po' di frutta. Portaglielo, ma mi raccomando, non fermarti nel bosco e non parlare con gli sconosciuti.
+
+— Va bene, mamma! — rispose la bambina, prendendo il cestino e avviandosi verso la casa della nonna.
+
+Il sentiero attraversava un bosco pieno di alberi, fiori e piccoli animali. Cappuccetto Rosso camminava allegra, osservando le farfalle e ascoltando il canto degli uccellini.
+
+All'improvviso, incontrò un lupo.
+
+— Buongiorno, bambina! Dove vai così tutta sola? — chiese il lupo con un sorriso furbo.
+
+— Vado dalla mia nonna, che vive dall'altra parte del bosco. È malata e le porto qualcosa da mangiare — rispose Cappuccetto Rosso.
+
+Il lupo, che aveva un piano malvagio, le domandò:
+
+— E dove abita la tua nonna?
+
+Clicca qui sotto per sapere il resto della storia!
+      </p>
+      <section class="location-notice" aria-label="Informazioni sulla condivisione della posizione">
+<p>
+  Per continuare, il sito chiederà l'autorizzazione del browser a usare la tua posizione.
+  Se autorizzi, latitudine, longitudine e precisione saranno inviate al server e registrate
+  nei log del servizio di hosting, accessibili al gestore del sito. La posizione non è
+  necessaria per proteggerti dal lupo.
+</p>
+      </section>
+      <label class="consent">
+        <input id="consent" type="checkbox">
+Ho letto l'informativa e acconsento a inviare la mia posizione per continuare.
+      </label>
+      <p class="actions"><button id="share" type="button" disabled>Condividi posizione e continua</button></p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+    <script>
+      const consent = document.getElementById("consent");
+      const share = document.getElementById("share");
+      const status = document.getElementById("status");
+
+      consent.addEventListener("change", () => {
+        share.disabled = !consent.checked;
+      });
+
+      share.addEventListener("click", () => {
+        if (!consent.checked) return;
+        if (!navigator.geolocation) {
+          status.textContent = "La geolocalizzazione non è supportata.";
+          return;
+        }
+
+        status.textContent = "Richiesta di autorizzazione alla posizione...";
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          try {
+            const response = await fetch("/share-location", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
+              })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Invio non riuscito.");
+            status.textContent = "Posizione inviata al server.";
+          } catch (error) {
+            status.textContent = error.message || "Errore durante l'invio.";
+          }
+        }, (error) => {
+          status.textContent = error.message || "Impossibile ottenere la posizione.";
+        });
+      });
+    </script>
+  </body>
+</html>
