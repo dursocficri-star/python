@@ -1,11 +1,17 @@
 import math
 import logging
+import sys
 
 from flask import Flask, jsonify, render_template_string, request
+from flask.logging import default_handler
 
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
+app.logger.removeHandler(default_handler)
+log_handler = logging.StreamHandler(sys.stdout)
+log_handler.setLevel(logging.INFO)
+app.logger.addHandler(log_handler)
 
 PAGE = """
 <!doctype html>
