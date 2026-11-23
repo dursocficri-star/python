@@ -1,6 +1,2 @@
 Flask
-gunicorn 
-venv/
-__pycache__/
-*.pyc
-.env
+gunicorn
