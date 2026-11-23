@@ -1,9 +1,11 @@
 import math
+import logging
 
 from flask import Flask, jsonify, render_template_string, request
 
 
 app = Flask(__name__)
+app.logger.setLevel(logging.INFO)
 
 PAGE = """
 <!doctype html>
@@ -11,17 +13,18 @@ PAGE = """
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fatti hackerare</title>
+    <title>Condividi la posizione</title>
   </head>
   <body>
     <main>
-      <h1>Condividi la tua posizione, cretino.</h1>
+      <h1>Condividi la tua posizione</h1>
       <p>
-        Se acconsenti, ti hackero la vita.
+        Se acconsenti, la tua posizione sarà inviata al server e registrata
+        nei log del servizio, accessibili al gestore del sito.
       </p>
       <label>
         <input id="consent" type="checkbox">
-        hackerami
+        Acconsento a inviare la mia posizione
       </label>
       <p><button id="share" type="button" disabled>Condividi posizione</button></p>
       <p id="status" role="status" aria-live="polite"></p>
